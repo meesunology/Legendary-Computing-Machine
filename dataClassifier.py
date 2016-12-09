@@ -70,6 +70,8 @@ def enhancedFeatureExtractorDigit(datum):
   #features =  basicFeatureExtractorDigit(datum)
   
   "*** YOUR CODE HERE ***"
+  a = datum.getPixels()
+  
   features = util.Counter()
   for x in range(FACE_DATUM_WIDTH):
     for y in range(FACE_DATUM_HEIGHT):
