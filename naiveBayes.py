@@ -62,20 +62,20 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
 
     "*** YOUR CODE HERE ***"
 
-    fvals = trainingData[0].values()
+    featureVals = trainingData[0].values()
     
-    self.prior = util.Counter()
+    self.before = util.Counter()
     for i in trainingLabels:
-        self.prior[i] += 1
-    self.prior.normalize()
-
-    ## Define: condCount[i] = #(f_j,y=label_i) where f_j is jth feature
+        self.before[i] += 1
+    self.before.normalize()
+    
     self.condProb = {}
+    
     for i in self.legalLabels:
         self.condProb[i] = {}
         for j in trainingData[0]:
             self.condProb[i][j] = util.Counter()
-            for m in fvals:
+            for m in featureVals:
                 self.condProb[i][j][m] = 1
     for n, img in enumerate(trainingData):
         i = trainingLabels[n]
@@ -114,7 +114,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     "*** YOUR CODE HERE ***"
     logJoint = util.Counter()
     for i in self.legalLabels:
-        logJoint[i] = math.log(self.prior[i], 2)
+        logJoint[i] = math.log(self.before[i], 2)
         for j in datum:
             logJoint[i] += math.log(self.condProb[i][j][datum[j]], 2)
 

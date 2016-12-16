@@ -51,9 +51,9 @@ def basicFeatureExtractorFace(datum):
   for x in range(FACE_DATUM_WIDTH):
     for y in range(FACE_DATUM_HEIGHT):
       if datum.getPixel(x, y) > 0:
-        features[(x,y)] = 1
+        features[(x,y)] += 1
       else:
-        features[(x,y)] = 0
+        features[(x,y)] += 0
   return features
 
 def enhancedFeatureExtractorDigit(datum):
@@ -67,18 +67,9 @@ def enhancedFeatureExtractorDigit(datum):
   
   ##
   """
-  features =  basicFeatureExtractorDigit(datum)
-
+  features = basicFeatureExtractorDigit(datum)
   "*** YOUR CODE HERE ***"
   
-  return features
-
-
-def contestFeatureExtractorDigit(datum):
-  """
-  Specify features to use for the minicontest
-  """
-  features =  basicFeatureExtractorDigit(datum)
   return features
 
 def enhancedFeatureExtractorFace(datum):
@@ -165,7 +156,7 @@ def readCommand( argv ):
   from optparse import OptionParser  
   parser = OptionParser(USAGE_STRING)
   
-  parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['mostFrequent', 'nb', 'naiveBayes', 'perceptron', 'mira', 'minicontest'], default='mostFrequent')
+  parser.add_option('-c', '--classifier', help=default('The type of classifier'), choices=['mostFrequent', 'nb', 'naiveBayes', 'perceptron', 'mira'], default='mostFrequent')
   parser.add_option('-d', '--data', help=default('Dataset to use'), choices=['digits', 'faces'], default='digits')
   parser.add_option('-t', '--training', help=default('The size of the training set'), default=100, type="int")
   parser.add_option('-f', '--features', help=default('Whether to use enhanced features'), default=False, action="store_true")
@@ -198,8 +189,6 @@ def readCommand( argv ):
       featureFunction = enhancedFeatureExtractorDigit
     else:
       featureFunction = basicFeatureExtractorDigit
-    if (options.classifier == 'minicontest'):
-      featureFunction = contestFeatureExtractorDigit
   elif(options.data=="faces"):
     printImage = ImagePrinter(FACE_DATUM_WIDTH, FACE_DATUM_HEIGHT).printImage
     if (options.features):
@@ -234,6 +223,7 @@ def readCommand( argv ):
 
   if(options.classifier == "mostFrequent"):
     classifier = mostFrequent.MostFrequentClassifier(legalLabels)
+
   elif(options.classifier == "naiveBayes" or options.classifier == "nb"):
     classifier = naiveBayes.NaiveBayesClassifier(legalLabels)
     classifier.setSmoothing(options.smoothing)
@@ -242,8 +232,10 @@ def readCommand( argv ):
         classifier.automaticTuning = True
     else:
         print "using smoothing parameter k=%f for naivebayes" %  options.smoothing
+
   elif(options.classifier == "perceptron"):
     classifier = perceptron.PerceptronClassifier(legalLabels,options.iterations)
+
   elif(options.classifier == "mira"):
     classifier = mira.MiraClassifier(legalLabels, options.iterations)
     if (options.autotune):
@@ -251,9 +243,7 @@ def readCommand( argv ):
         classifier.automaticTuning = True
     else:
         print "using default C=0.001 for MIRA"
-  elif(options.classifier == 'minicontest'):
-    import minicontest
-    classifier = minicontest.contestClassifier(legalLabels)
+
   else:
     print "Unknown classifier:", options.classifier
     print USAGE_STRING
