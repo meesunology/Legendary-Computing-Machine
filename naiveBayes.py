@@ -39,7 +39,7 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     # this is a list of all features in the training set.
     self.features = list(set([ f for datum in trainingData for f in datum.keys() ]));
     
-    if (self.automaticTuning):
+    if (self.automaticTuning): # self.k is not 1
         kgrid = [0.001, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 20, 50]
     else:
         kgrid = [self.k]
@@ -61,7 +61,30 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    featureVals = trainingData[0].values()
+    
+    self.before = util.Counter()
+    for i in trainingLabels:
+        self.before[i] += 1
+    self.before.normalize()
+    
+    self.condProb = {}
+    
+    for i in self.legalLabels:
+        self.condProb[i] = {}
+        for j in trainingData[0]:
+            self.condProb[i][j] = util.Counter()
+            for m in featureVals:
+                self.condProb[i][j][m] = 1
+    for n, img in enumerate(trainingData):
+        i = trainingLabels[n]
+        for j in img:
+            self.condProb[i][j][img[j]] += self.k   # smoothing
+    for i in self.legalLabels:
+        for j in trainingData[0]:
+            self.condProb[i][j].normalize()
+
         
   def classify(self, testData):
     """
@@ -89,7 +112,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     logJoint = util.Counter()
     
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    logJoint = util.Counter()
+    for i in self.legalLabels:
+        logJoint[i] = math.log(self.before[i], 2)
+        for j in datum:
+            logJoint[i] += math.log(self.condProb[i][j][datum[j]], 2)
+
     
     return logJoint
   
