@@ -41,7 +41,7 @@ class Network():
             for batch in mini_batches:
                 self.update_mini_batch(batch, learningrate)
             if test_data:
-                print "Iteration {0} : {1} / {2}".format(j, self.evaluate(test_data), n_test)
+                print "Iteration {0}     : {1} / {2}".format(j, self.evaluate(test_data), n_test)
             else:
                 print "Iteration {0} complete".format(j)
     
@@ -53,13 +53,6 @@ class Network():
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         
-        '''
-        self.weights = [w-(learningrate/len(mini_batch)) * nw 
-        for w, nw in zip(self.weights, nabla_w)]
-        
-        self.biases - [b-(learningrate/len(mini_batch)) * nb 
-        for b, nb in zip(self.biases, nabla_b)]
-        '''
 
         self.weights = [w-(learningrate/len(mini_batch))*nw
                         for w, nw in zip(self.weights, nabla_w)]
@@ -68,10 +61,8 @@ class Network():
 
     def backprop(self, x, y):
         """
-        Return a tuple ``(nabla_b, nabla_w)`` representing the
-        gradient for the cost function C_x.  ``nabla_b`` and
-        ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
-        to ``self.biases`` and ``self.weights``.
+        Returns (nabla_b, nabla_w) that represents the gradient for the cost function.
+        Both elements are layer-by-layer lists of numpy ndarrays.
         """
         nabla_b = [numpy.zeros(b.shape) for b in self.biases]
         nabla_w = [numpy.zeros(w.shape) for w in self.weights]
@@ -84,17 +75,13 @@ class Network():
             zs.append(z)
             activation = self.sigmoid(z)
             activations.append(activation)
+
         # backward pass
         delta = self.cost_derivative(activations[-1], y) * \
             self.sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = numpy.dot(delta, activations[-2].transpose())
-        # Note that the variable l in the loop below is used a little
-        # differently to the notation in Chapter 2 of the book.  Here,
-        # l = 1 means the last layer of neurons, l = 2 is the
-        # second-last layer, and so on.  It's a renumbering of the
-        # scheme in the book, used here to take advantage of the fact
-        # that Python can use negative indices in lists.
+        
         for l in xrange(2, self.num_layers):
             z = zs[-l]
             sp = self.sigmoid_prime(z)
@@ -104,8 +91,10 @@ class Network():
         return (nabla_b, nabla_w)
 
     def evaluate(self, test_data):
-        test_results = [(numpy.argmax(self.feedforward(x)), y) for (x,y) in test_data]
-        return sum(int(x==y) for (x,y) in test_results)
+        test_results = [(numpy.argmax(self.feedforward(x)), y)
+                        for (x, y) in test_data]
+        totalCorrect = sum(int(x==y) for (x,y) in test_results)
+        return totalCorrect
 
     def cost_derivative(self, output_activations, y):
         return(output_activations - y)

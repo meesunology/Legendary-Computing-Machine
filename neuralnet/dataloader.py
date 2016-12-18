@@ -31,8 +31,8 @@ def load_wrapper():
         and y = the actual digit values (integers) corresponding to x
     """
     tr_d, va_d, te_d = load()
-    training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]]
-    training_results = [vectorized_result(y) for y in tr_d[1]]
+    training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]] # tr_d[0] is the training images
+    training_results = [vectorized_result(y) for y in tr_d[1]] # tr_d[1] is the training labels, in a unit vectorized form
     training_data = zip(training_inputs, training_results)
     validation_inputs = [np.reshape(x, (784, 1)) for x in va_d[0]]
     validation_data = zip(validation_inputs, va_d[1])
